@@ -1,0 +1,29 @@
+{
+  "name": "nyzostrings",
+  "version": "0.0.1",
+  "description": "NyzoString NodeJS Library",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "build": "webpack --display-modules",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AngainorDev/NyzoStrings.git"
+  },
+  "keywords": [
+    "Crypocurrency",
+    "Nyzo",
+    "Wallet",
+    "Blockchain"
+  ],
+  "author": "Angainor",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AngainorDev/NyzoStrings/issues"
+  },
+  "homepage": "https://github.com/AngainorDev/NyzoStrings#readme"
+}
