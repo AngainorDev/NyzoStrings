@@ -57,6 +57,8 @@ class NyzoStringEncoder {
         prefixBuffer[i++] = contentBytes.length
         let contentBuffer = Buffer.concat([prefixBuffer, Buffer.from(contentBytes)])
         // TODO: run benchmarks to check if we loose much by concat instead of defining the full buffer first then copy the parts.
+        // See Buffer.copy https://nodejs.org/en/knowledge/advanced/buffers/how-to-use-buffers/
+        // https://nodejs.org/api/buffer.html#buffer_buf_copy_target_targetstart_sourcestart_sourceend
         // Compute the checksum and add the appropriate number of bytes to the end of the array.
         const checksum = createHash('sha256').update(createHash('sha256').update(contentBuffer).digest()).digest()
         const expandedBuffer = Buffer.concat([contentBuffer, checksum], expandedLength)
