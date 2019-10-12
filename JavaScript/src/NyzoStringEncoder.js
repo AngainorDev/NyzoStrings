@@ -4,6 +4,7 @@
 const createHash = require('create-hash')
 const { NyzoStringPublicIdentifier } = require('./NyzoStringPublicIdentifier')
 const { NyzoStringPrivateSeed } = require('./NyzoStringPrivateSeed')
+const { NyzoStringPrefilledData } = require('./NyzoStringPrefilledData')
 
 
 const CHARACTER_LOOKUP = "0123456789" +
@@ -104,7 +105,7 @@ class NyzoStringEncoder {
                         // Make the object from the content array.
                         switch (type) {
                             case 'pre_':
-                                result = NyzoStringPrefilledData.fromByteBuffer(ByteBuffer.wrap(contentBytes))
+                                result = NyzoStringPrefilledData.fromByteBuffer(contentBytes)
                                 break
                             case 'key_':
                                 result = new NyzoStringPrivateSeed(contentBytes)
@@ -123,7 +124,7 @@ class NyzoStringEncoder {
                 }
             }
         } catch (ignored) {
-            // console.log(ignored)  // debug
+            console.log(ignored)  // debug
         }
 
         return result

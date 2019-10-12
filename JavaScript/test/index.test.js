@@ -2,6 +2,7 @@ const { NyzoTypes, NyzoStringType } = require('../src/NyzoStringType')
 const { NyzoString } = require('../src/NyzoString')
 const { NyzoStringPublicIdentifier } = require('../src/NyzoStringPublicIdentifier')
 const { NyzoStringPrivateSeed } = require('../src/NyzoStringPrivateSeed')
+const { NyzoStringPrefilledData } = require('../src/NyzoStringPrefilledData')
 
 const { nyzoStringEncoder } = require('../src/NyzoStringEncoder')
 
@@ -118,5 +119,79 @@ describe("PrivateSeed Tests", () => {
     const decoded = nyzoStringEncoder.decode(encoded)
     expect(decoded.getBytes()).toEqual(nyzoString.getBytes())
   })
+ })
+
+
+ describe("Prefilled Data Tests", () => {
+  test("Vector 0", () => {
+    const nyzoString = NyzoStringPrefilledData.fromHex("1a74dff9c1bb47f7-01eabcfd217f2d6e-ab58a6889efaa44b-5bbe06d396596560", "82fb2a31c2fdedd9")
+    const encoded = nyzoStringEncoder.encode(nyzoString)
+    expect(encoded).toBe('pre_ahGSV_E1LSwV0vH-_i5_bnYInar8EMHBiTL~1Kennnmx28bZaA72_vVqroRgFqRe')
+    const decoded = nyzoStringEncoder.decode(encoded)
+    expect(decoded.getReceiverIdentifier()).toEqual(nyzoString.getReceiverIdentifier())
+    expect(decoded.getSenderData()).toEqual(nyzoString.getSenderData())
+    expect(decoded.getBytes()).toEqual(nyzoString.getBytes())
+  })
+  test("Vector 17000", () => {
+    const nyzoString = NyzoStringPrefilledData.fromHex("53daaf0f7243222a-89324a82a2f2da6d-e9a3c025c3156b9d-fbd1bdab6af1409c", "536142cd5127b085fd48d3512cc3300abdd7bbca774d691e76437f7db0")
+    const encoded = nyzoStringEncoder.encode(nyzoString)
+    expect(encoded).toBe('pre_fCfrIN.QgQ8Hzj9axHbQUDVGF-0CNPmIEwMhMrKH-k2t7mdygJTh9Z25_kAjkiR3c0H.TZMauSTG7Eq3wVUNIh0cVwG-')
+    const decoded = nyzoStringEncoder.decode(encoded)
+    expect(decoded.getReceiverIdentifier()).toEqual(nyzoString.getReceiverIdentifier())
+    expect(decoded.getSenderData()).toEqual(nyzoString.getSenderData())
+    expect(decoded.getBytes()).toEqual(nyzoString.getBytes())
+  })
+  test("Vector 44000", () => {
+    // Take care to include at least one test with empty data
+    const nyzoString = NyzoStringPrefilledData.fromHex("b0c5aef7f03d6c95-e6643f98e12196cb-41fff5e71d4903f4-55419cf80e28781e", "")
+    const encoded = nyzoStringEncoder.encode(nyzoString)
+    expect(encoded).toBe('pre_8s35IMwNfnQmXDg_De4yCJK1__oE7kB3.5m1Efxea7xv0c64GT24')
+    const decoded = nyzoStringEncoder.decode(encoded)
+    expect(decoded.getReceiverIdentifier()).toEqual(nyzoString.getReceiverIdentifier())
+    expect(decoded.getSenderData()).toEqual(nyzoString.getSenderData())
+    expect(decoded.getBytes()).toEqual(nyzoString.getBytes())
+  })
+  test("Vector 75000", () => {
+    // max data size
+    const nyzoString = NyzoStringPrefilledData.fromHex("7182d875367fbb32-eef8831d47079a78-fd5daf7aabaa145e-1bdb4914676ae579", "8044e813bd9acf83149a31d819e22c820edc76f3cd00cd87e67958495e562cd3")
+    const encoded = nyzoStringEncoder.encode(nyzoString)
+    expect(encoded).toBe('pre_go62U7kUwZJQZMz37kt7DEA.or.YHYFkoyMsihhErLmX8814Y1e.DJ~359FPU1Ezb88eV7sRRg3dy~qXn4CvmzRjFuo.qVfn')
+    const decoded = nyzoStringEncoder.decode(encoded)
+    expect(decoded.getReceiverIdentifier()).toEqual(nyzoString.getReceiverIdentifier())
+    expect(decoded.getSenderData()).toEqual(nyzoString.getSenderData())
+    expect(decoded.getBytes()).toEqual(nyzoString.getBytes())
+  })
+})
+
+
+ describe("Prefilled Data Custom Tests", () => {
+    // include custom tests with too large a data buffer
+  test("Vector 75000+", () => {
+    // max data size + more data
+    const nyzoString = NyzoStringPrefilledData.fromHex("7182d875367fbb32-eef8831d47079a78-fd5daf7aabaa145e-1bdb4914676ae579", "8044e813bd9acf83149a31d819e22c820edc76f3cd00cd87e67958495e562cd38044e813bd9acf83149a31d819e22c820edc76f3cd00cd87e67958495e562cd3")
+
+    const encoded = nyzoStringEncoder.encode(nyzoString)
+    expect(encoded).toBe('pre_go62U7kUwZJQZMz37kt7DEA.or.YHYFkoyMsihhErLmX8814Y1e.DJ~359FPU1Ezb88eV7sRRg3dy~qXn4CvmzRjFuo.qVfn')
+    const decoded = nyzoStringEncoder.decode(encoded)
+    expect(decoded.getReceiverIdentifier()).toEqual(nyzoString.getReceiverIdentifier())
+    expect(decoded.getSenderData()).toEqual(nyzoString.getSenderData())
+    expect(decoded.getBytes()).toEqual(nyzoString.getBytes())
+  })
+  test("Vector 75000 + noise18", () => {
+    const encoded2 = 'pre_go62U7kUwZJQZMz37kt7DEA.or.YHYFkoyMsihhErLmX8814Y1e.DJ~359FPU1Ezb88eV7sRRg3dy~qXn4CvmzRjFuo.qVfn' + 'qXn4CvmzRjFuo.qVfn' // Add content at end
+    const decoded2 = nyzoStringEncoder.decode(encoded2)
+    expect(decoded2).toBe(null)  // checksum len does not match 4 to 6
+  })
+  test("Vector 75000 + noise1", () => {
+    const encoded2 = 'pre_go62U7kUwZJQZMz37kt7DEA.or.YHYFkoyMsihhErLmX8814Y1e.DJ~359FPU1Ezb88eV7sRRg3dy~qXn4CvmzRjFuo.qVfn' + 'q' // Add content at end
+    const decoded2 = nyzoStringEncoder.decode(encoded2)
+    expect(decoded2).toBe(null)  // checksum len does not match 4 to 6
+  })
+  test("Vector 75000 corrupted", () => {
+    const encoded2 = 'pre_go62U7kUwZJQZMz37kt7DEA.or.YHYFkoyMsihhErLmX8814Y1e.DJ~359FPU1Ezb88eV7sRRg3dy~qXn3CvmzRjFuo.qVfn' // 1 changed char
+    const decoded2 = nyzoStringEncoder.decode(encoded2)
+    expect(decoded2).toBe(null)  // checksum does not match
+  })
+
  })
 
