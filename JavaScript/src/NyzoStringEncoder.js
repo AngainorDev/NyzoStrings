@@ -5,6 +5,7 @@ const createHash = require('create-hash')
 const { NyzoStringPublicIdentifier } = require('./NyzoStringPublicIdentifier')
 const { NyzoStringPrivateSeed } = require('./NyzoStringPrivateSeed')
 const { NyzoStringPrefilledData } = require('./NyzoStringPrefilledData')
+const { NyzoStringMicropay } = require('./NyzoStringMicropay')
 
 
 const CHARACTER_LOOKUP = "0123456789" +
@@ -114,10 +115,10 @@ class NyzoStringEncoder {
                                 result = new NyzoStringPublicIdentifier(contentBytes)
                                 break
                             case 'pay_':
-                                result = NyzoStringMicropay.fromByteBuffer(ByteBuffer.wrap(contentBytes))
+                                result = NyzoStringMicropay.fromByteBuffer(contentBytes)
                                 break
                             case 'tx__':
-                                result = NyzoStringTransaction.fromByteBuffer(ByteBuffer.wrap(contentBytes))
+                                result = NyzoStringTransaction.fromByteBuffer(contentBytes)
                                 break
                         }
                     }
