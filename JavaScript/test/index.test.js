@@ -1,6 +1,8 @@
 const { NyzoTypes, NyzoStringType } = require('../src/NyzoStringType')
 const { NyzoString } = require('../src/NyzoString')
 const { NyzoStringPublicIdentifier } = require('../src/NyzoStringPublicIdentifier')
+const { NyzoStringPrivateSeed } = require('../src/NyzoStringPrivateSeed')
+
 const { nyzoStringEncoder } = require('../src/NyzoStringEncoder')
 
 
@@ -18,6 +20,13 @@ describe("Tests Debug", () => {
     console.log("Type Transaction", ttype4)
   })
  })
+
+
+describe("Old charset Tests", () => {
+      test("TODO", () => {
+
+      })
+})
 
 
 describe("PublicIdentifier Tests", () => {
@@ -63,5 +72,51 @@ describe("PublicIdentifier Tests", () => {
     const decoded = nyzoStringEncoder.decode(encoded)
     expect(decoded.getBytes()).toEqual(nyzoString.getBytes())
   })
-  // TODO: Also add tests with on purpose old style strings (older charset) to fully validate.
  })
+
+
+describe("PrivateSeed Tests", () => {
+  test("Vector 0", () => {
+    const nyzoString = NyzoStringPrivateSeed.fromHex("74d84ed425f51e6f-aa9bae140e952601-29d16a73241231dc-6962619b5fbc6e27")
+    const encoded = nyzoStringEncoder.encode(nyzoString)
+    expect(encoded).toBe('key_87jpjKgC.hXMHGLL50Ym9x4GSnGR918PV6CzpqKwM6WEgqRzfABZ')
+    const decoded = nyzoStringEncoder.decode(encoded)
+    expect(decoded.getBytes()).toEqual(nyzoString.getBytes())
+  })
+  test("Vector 8000", () => {
+    const nyzoString = NyzoStringPrivateSeed.fromHex("83a2c34eef86da60-e0d26b82a305367b-cf4ed6893ed5d807-0f2fae99a97d77bd")
+    const encoded = nyzoStringEncoder.encode(nyzoString)
+    expect(encoded).toBe('key_88ezNSZMyKGxWd9IxHc5dEMfjKr9fKop1N-MIGDGwov.tBBqPRDY')
+    const decoded = nyzoStringEncoder.decode(encoded)
+    expect(decoded.getBytes()).toEqual(nyzoString.getBytes())
+  })
+  test("Vector 13000", () => {
+    const nyzoString = NyzoStringPrivateSeed.fromHex("e58d51a913e209db-8645d6d78f061309-d2af2ef1ed651788-4ea8d4bc4f678401")
+    const encoded = nyzoStringEncoder.encode(nyzoString)
+    expect(encoded).toBe('key_8endkrBjWxEsyBonTW-64NEiIQZPZnkoz4YFTbPfqWg1jt28sUiM')
+    const decoded = nyzoStringEncoder.decode(encoded)
+    expect(decoded.getBytes()).toEqual(nyzoString.getBytes())
+  })
+  test("Vector 19000", () => {
+    const nyzoString = NyzoStringPrivateSeed.fromHex("c253802154f4aa04-906275b8f922ed86-81cf11d2cac11a92-8dcdf3bee1c5af32")
+    const encoded = nyzoStringEncoder.encode(nyzoString)
+    expect(encoded).toBe('key_8c9jx25k.aF4B69TLfBzZpr1RP7iQJ4rBFVd-ZZyPr-QQWm3Ivcv')
+    const decoded = nyzoStringEncoder.decode(encoded)
+    expect(decoded.getBytes()).toEqual(nyzoString.getBytes())
+  })
+  test("Vector 25000", () => {
+    const nyzoString = NyzoStringPrivateSeed.fromHex("2882cc9feb9e0861-ccb999c8400cf515-49b73fab4cc6c7a8-0cffef201fc2e777")
+    const encoded = nyzoStringEncoder.encode(nyzoString)
+    expect(encoded).toBe('key_82z2R9_IExyyRbDqQ40c.hm9KR~Ijcs7H0R_ZQ0wNLuV9ieWk_p4')
+    const decoded = nyzoStringEncoder.decode(encoded)
+    expect(decoded.getBytes()).toEqual(nyzoString.getBytes())
+  })
+  test("Vector 79000", () => {
+    const nyzoString = NyzoStringPrivateSeed.fromHex("d60987f22773e4c7-7efb079e9900554e-b6efb568de81ec74-f7396efab7f5605d")
+    const encoded = nyzoStringEncoder.encode(nyzoString)
+    expect(encoded).toBe('key_8dp9y_8Et~j7wMJ7EGB0mkYUZZmFVF7JuftXsMHV.n1upfKfwunh')
+    const decoded = nyzoStringEncoder.decode(encoded)
+    expect(decoded.getBytes()).toEqual(nyzoString.getBytes())
+  })
+ })
+

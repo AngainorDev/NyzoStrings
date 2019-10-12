@@ -3,6 +3,7 @@
 
 const createHash = require('create-hash')
 const { NyzoStringPublicIdentifier } = require('./NyzoStringPublicIdentifier')
+const { NyzoStringPrivateSeed } = require('./NyzoStringPrivateSeed')
 
 
 const CHARACTER_LOOKUP = "0123456789" +
@@ -14,7 +15,7 @@ const CHARACTER_LOOKUP = "0123456789" +
 // These were computed once by the test suite, then hardcoded here so NyzoStringType is not needed in real code.
 const NYZO_PREFIXES_BYTES = {
     'pre_': new Uint8Array([97, 163, 191]),
-    'key_': new Uint8Array([80, 232, 227]),
+    'key_': new Uint8Array([80, 232, 127]),
     'id__': new Uint8Array([72, 223, 255]),
     'pay_': new Uint8Array([96, 168, 127]),
     'tx__': new Uint8Array([114, 15, 255]),
