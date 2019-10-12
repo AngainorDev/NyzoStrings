@@ -5,7 +5,7 @@
  */
 $version = "0.0.1";
 
-final class NyzoString {
+class NyzoString {
 
   private $type, $bytes;
 
