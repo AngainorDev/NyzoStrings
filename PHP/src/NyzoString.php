@@ -7,7 +7,7 @@ $version = "0.0.1";
 
 class NyzoString {
 
-  private $type, $bytes;
+  protected $type, $bytes;
 
   public function __construct(string $type, array $bytes) {
     $this->type = $type;

@@ -1,17 +1,19 @@
 <?php
-
-  require_once("./NyzoString.php");  
+  /**
+   * ref: https://github.com/n-y-z-o/nyzoVerifier/blob/master/src/main/java/co/nyzo/verifier/nyzoString/NyzoStringEncoder.java
+   */
+  require_once("NyzoString.php");  
 
   $version = "0.0.2";
 
   final class NyzoStringEncoder {
     
     const CHARACTER_LOOKUP = "0123456789" .
-                             "abcdefghijkmnopqrstuvwxyz" .
-                             "ABCDEFGHIJKLMNPQRSTUVWXYZ" .
-                             "-.~_";
+                             "abcdefghijkmnopqrstuvwxyz" . // all except lowercase "L"
+                             "ABCDEFGHIJKLMNPQRSTUVWXYZ" . // all except uppercase "o"
+                             "-.~_";                       // see https://tools.ietf.org/html/rfc3986#section-2.3
     
-    // These were computed once by he test suite, then hardcoded here so NyzoStringType is not needed in real code.
+    // These were computed once by the test suite, then hardcoded here so NyzoStringType is not needed in real code.
     const NYZO_PREFIXES_BYTES = [
       "pre_" => [97, 163, 191],
       "key_" => [80, 232, 227],
@@ -21,15 +23,15 @@
     ];
   
     const HEADER_LENGTH = 4;
+
     private $characterToValueMap;
 
-    public function __construct(){
+    public function __construct() {
       $this->characterToValueMap = [];
 
       for($i = 0; $i < strlen(NyzoStringEncoder::CHARACTER_LOOKUP); $i++) {
         $this->characterToValueMap[NyzoStringEncoder::CHARACTER_LOOKUP[$i]] = $i;
       }
-      
     }
 
     public function encode(NyzoString $stringObject): string {
@@ -116,5 +118,4 @@
       return $value;
     }
   }
-
 ?>
