@@ -4,6 +4,7 @@ const { NyzoStringPublicIdentifier } = require('../src/NyzoStringPublicIdentifie
 const { NyzoStringPrivateSeed } = require('../src/NyzoStringPrivateSeed')
 const { NyzoStringPrefilledData } = require('../src/NyzoStringPrefilledData')
 const { NyzoStringMicropay } = require('../src/NyzoStringMicropay')
+const { NyzoStringTransaction } = require('../src/NyzoStringTransaction')
 
 const { nyzoStringEncoder } = require('../src/NyzoStringEncoder')
 
@@ -207,7 +208,40 @@ describe("Micropay Tests", () => {
     const encoded = nyzoStringEncoder.encode(nyzoString)
     expect(encoded).toBe('pay_s_v6Iiyr9h~HrTDRkZxZ3curnGXjHqSkAawPgXB9UynD5yW68wxpP4VCt0Rb93~XYd2DnJV72kfZXjWCIb7a-dAyfdt0cCxCsrdZajkqQEzxhvf6qM_J1vwABJ30E8HqeFx-AQG0~hnGXgqqWe5M2avMAHTp')
     const decoded = nyzoStringEncoder.decode(encoded)
-    // todo: More detailled tests (but comparing core bytes storage should be enough)
+    // todo: More detailed tests (but comparing core bytes storage should be enough)
+    expect(decoded.getBytes()).toEqual(nyzoString.getBytes())
+  })
+
+})
+
+
+
+describe("Transaction Tests", () => {
+  test("Vector 0", () => {
+    const nyzoString = NyzoStringTransaction.fromHex("9bdecd1085b8f5e1", "545d4b257f8def80",
+        "3ce4eaf311934276-673752ccb5cf4cac-61eed231d8fcb649-6310887ecf99f6e5", "e6e882dc8cd92291",
+        "d5fbaeaeb085b299-eb028094fe472330-5eb9f6427e7c3d38-7ece7edc91fb3983",
+        "7695f21b83c22fff-5172d720e6aca180-a017d5af55dbd85f-3b23526794a75872",
+        "360cb35fc71a111e2576cf",
+        "6a675732bd20a2c203a925fc62f1d5249b98c128b555472c980f84d9d37fb3452c7211ea448eeed51b7af17785490593a429e97a4f373788a1a768e40d64657c"
+        )
+    const encoded = nyzoStringEncoder.encode(nyzoString)
+    expect(encoded).toBe('tx__GgasVJSgysATWmhuiQm_Av~0fejH-P6jgEqEdTbcKt.cI67LSA7p_bq9pP28wJ~q.LoDY8btAdBzBorm-yL3Nz__kobo8erJFp2x5.nMmuMpoRJAkDvkGTyQ2RpcJT_76y4v9osfrDuocISxFJ83Hio-pM7m99LpNizTmktJD0~4Uud_JSkJty7Hh8ZLThKY-ov5ignjG2EGvB-VdWzyGUAB3nhCwe~GDN_e')
+    const decoded = nyzoStringEncoder.decode(encoded)
+    // todo: More detailed tests (but comparing core bytes storage should be enough)
+    expect(decoded.getBytes()).toEqual(nyzoString.getBytes())
+  })
+  test("Vector 26000", () => {
+    const nyzoString = NyzoStringTransaction.fromHex("ba94f30cfffa6590", "ba80822eefb07338",
+        "7aad5eb4000f5400-a848d584c7eeabd9-4e28ed04a249115f-a17c126bf9fe896c", "7091c9f882e5b51d",
+        "d8f53af77b321d7b-82f04ff1db0c86fa-6516744752fcd9e0-df49f5a7c83bd148",
+        "2e4df5134377f512-86ddee2159689033-a0cb484d757b223f-439b6c7cd03c5d2f",
+        "",
+        "54ea57754c832e04bdef6d06adbab4a7b754550b92bb7323c7d0fa75825bd8d2445f49bc5926359eac5de99e9b36b30113894f3f0a4e5afd8523a5763ea90483"
+        )
+    const encoded = nyzoStringEncoder.encode(nyzoString)
+    expect(encoded).toBe('tx__DxaYCfcc__GCBbH0xzZMJ7cWvHTvK00fm02Fidn4P~YIUkWFZgizih5wFoNir_E~znPNBtEWxLnT7iXd.hd3u_kiyKVL8mCFB3exQSyduoJzfSess7Rgf5SM05jHmVmcxQW4Mv.K1HUYKavVm5kbBIKR8-wg~En2n.Aih5.9M5BDdqYJovDvDRrR0he9jR-ajCI.yieCuAYG18cYfyrZ')
+    const decoded = nyzoStringEncoder.decode(encoded)
     expect(decoded.getBytes()).toEqual(nyzoString.getBytes())
   })
 

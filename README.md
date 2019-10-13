@@ -12,12 +12,13 @@ Libraries to handle Nyzo Strings in various languages.
 
 - Test vectors for all string types were extracted from reference Java implementation
 - Crude port of the java code to JavaScript
-- Working encoding of PublicIdentifier string type
+- Working encoding and decoding of all string types
 - Test suite
+
+- Ongoing PR for a Python port
 
 ## Roadmap
 
-- JS: Implementation of decode and encode for all string types
 - Port library to other languages. PHP, Python, More
 
 ## Licence

@@ -13,10 +13,12 @@ git clone or `npm install nyzostrings`
 - Working encoding + decoding of PrivateSeed string type
 - Working encoding + decoding of PrefilledData string type
 - Working encoding + decoding of Micropay string type
+- Working encoding + decoding of Transactions string type - **Only standard transactions**
 - Test suite
 
 ## Changelog
 
+- 0.0.6: Standard transactions encoding and decoding, test vectors.
 - 0.0.5: Micropay encoding and decoding, test vectors.
 - 0.0.4: PrefilledData encoding and decoding, test vectors.
 - 0.0.3: PrivateSeed encoding and decoding, test vectors.

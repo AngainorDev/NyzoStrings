@@ -6,6 +6,7 @@ const { NyzoStringPublicIdentifier } = require('./NyzoStringPublicIdentifier')
 const { NyzoStringPrivateSeed } = require('./NyzoStringPrivateSeed')
 const { NyzoStringPrefilledData } = require('./NyzoStringPrefilledData')
 const { NyzoStringMicropay } = require('./NyzoStringMicropay')
+const { NyzoStringTransaction } = require('./NyzoStringTransaction')
 
 
 const CHARACTER_LOOKUP = "0123456789" +
