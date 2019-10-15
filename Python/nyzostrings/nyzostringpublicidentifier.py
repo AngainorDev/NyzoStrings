@@ -20,3 +20,5 @@ class NyzoStringPublicIdentifier(NyzoString):
     def from_hex(cls, hex_string: str) -> "NyzoStringPublicIdentifier":
         filtered_string = hex_string.replace('-', '')[:64]
         return NyzoStringPublicIdentifier(bytes.fromhex(filtered_string))
+
+

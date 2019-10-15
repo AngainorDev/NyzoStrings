@@ -23,7 +23,7 @@ CHARACTER_LOOKUP = (
 # From JS code
 NYZO_PREFIXES_BYTES = {
     "pre_": bytes([97, 163, 191]),
-    "key_": bytes([80, 232, 227]),
+    "key_": bytes([80, 232, 127]),
     "id__": bytes([72, 223, 255]),
     "pay_": bytes([96, 168, 127]),
     "tx__": bytes([114, 15, 255]),
