@@ -9,6 +9,8 @@ from hashlib import sha256
 from nyzostrings.nyzostring import NyzoString
 from nyzostrings.nyzostringpublicidentifier import NyzoStringPublicIdentifier
 from nyzostrings.nyzostringprivateseed import NyzoStringPrivateSeed
+from nyzostrings.nyzostringmicropay import NyzoStringMicropay
+
 
 __version__ = "0.0.3"
 

@@ -13,7 +13,7 @@ class NyzoStringPrivateSeed(NyzoString):
     def __init__(self, identifier: bytes) -> None:
         super().__init__('key_', identifier)
 
-    def get_Seed(self) -> bytes:
+    def get_seed(self) -> bytes:
         return self.bytes_content
 
     @classmethod
