@@ -1,10 +1,9 @@
 <?php
-/**
- * ref: https://github.com/n-y-z-o/nyzoVerifier/blob/master/src/main/java/co/nyzo/verifier/nyzoString/NyzoStringPublicIdentifier.java
- */
+  /**
+   * ref: https://github.com/n-y-z-o/nyzoVerifier/blob/master/src/main/java/co/nyzo/verifier/nyzoString/NyzoStringPublicIdentifier.java
+   * version: 0.0.1
+   */
   require_once("NyzoString.php");
-
-  $version = "0.0.1";
 
   final class NyzoStringPublicIdentifier extends NyzoString {
 
@@ -18,8 +17,8 @@
 
     public static function fromHex(string $hexString): NyzoStringPublicIdentifier {
       $filteredString = substr(implode("", explode("-", $hexString)), 0, 64);
-      $hexArray = unpack("C*", hex2bin($filteredString));
-      return new NyzoStringPublicIdentifier($hexArray);
+      $binArray = unpack("C*", hex2bin($filteredString));
+      return new NyzoStringPublicIdentifier($binArray);
     }
   }
 ?>

@@ -1,10 +1,9 @@
 <?php
   /**
    * ref: https://github.com/n-y-z-o/nyzoVerifier/blob/master/src/main/java/co/nyzo/verifier/nyzoString/NyzoStringEncoder.java
+   * version: 0.0.1
    */
-  require_once("NyzoString.php");  
-
-  $version = "0.0.2";
+  require_once("NyzoString.php");
 
   final class NyzoStringEncoder {
     
