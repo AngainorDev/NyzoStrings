@@ -4,6 +4,7 @@
    * version: 0.0.1
    */
   require_once("NyzoString.php");
+  require_once("NyzoStringPublicIdentifier.php");
 
   final class NyzoStringEncoder {
     
@@ -20,6 +21,9 @@
       "pay_" => [96, 168, 127],
       "tx__" => [114, 15, 255]
     ];
+
+    // Get a list of valid prefixes for future use.
+    const NYZO_PREFIXES = array_keys(NyzoStringEncoder::NYZO_PREFIXES_BYTES);
   
     const HEADER_LENGTH = 4;
 
@@ -58,17 +62,68 @@
       
       
       // Compute the checksum and add the appropriate number of bytes to the end of the array.
-      // Need to use pack to convert contentBuffer into a binary string
-      // because hash function requires string input. Using C* will treat each item
-      // in the binary string as as char (UInt8)
-      $contentBufferBinaryStr = pack("C*", ...$contentBuffer);
-      $hash1Raw = hash('sha256', $contentBufferBinaryStr, true);
-      $checksumRaw = hash('sha256', $hash1Raw, true);
-      // Need to use unpack to convert the binary string back into an array of char (UInt8).
-      $checksum = unpack("C*", $checksumRaw);
+      $checksum = $this->createChecksum($contentBuffer);
       $expandedBuffer = array_slice(array_merge($contentBuffer, $checksum), 0, $expandedLength);
       // Build and return the encoded string from the expanded array.
       return $this->encodedStringForByteArray($expandedBuffer);
+    }
+
+    public function decode(string $encodedString): NyzoString {
+      $result = null;
+      try {
+        // Map characters from the old encoding to the new encoding. A few characters were changed to make Nyzo
+        // strings more URL-friendly.
+        $encodedString = str_replace("*", "-", $encodedString);
+        $encodedString = str_replace("+", ".", $encodedString);
+        $encodedString = str_replace("=", "~", $encodedString);
+        // Map characters that may be mistyped. Nyzo strings contain neither 'l' nor 'O'.
+        $encodedString = str_replace("l", "1", $encodedString);
+        $encodedString = str_replace("O", "0", $encodedString);
+
+        $type = substr($encodedString, 0, 4);
+        if(array_key_exists($type, NyzoStringEncoder::NYZO_PREFIXES_BYTES)) {
+          $expandedArray = $this->byteArrayForEncodedString($encodedString);
+          // Get the content length from the next byte and calculate the checksum length.
+          $contentLength = $expandedArray[3] & 0xff;
+          $checksumLength = sizeof($expandedArray) - $contentLength - 4;
+          // Only continue if the checksum length is valid.
+          if($checksumLength >= 4 && $checksumLength <= 6) {
+            // Calculate the checksum and compare it to the provided checksum.
+            // Only create the result array if the checksums match.
+            $contentBuffer = array_slice($expandedArray, 0, NyzoStringEncoder::HEADER_LENGTH + $contentLength);
+            $fullCalculatedChecksum = $this->createChecksum($contentBuffer);
+            $calculatedChecksum = array_slice($fullCalculatedChecksum, 0, $checksumLength);
+            $providedChecksum = array_slice($expandedArray, sizeof($expandedArray) - $checksumLength, sizeof($expandedArray));
+            if($providedChecksum === $calculatedChecksum) {
+              // Get the content array. This is the encoded object with the prefix, length byte, and checksum
+              // removed.
+              $contentBytes = array_slice($expandedArray, NyzoStringEncoder::HEADER_LENGTH, sizeof($expandedArray) - $checksumLength);
+              // Make the object from the content array.
+              switch($type) {
+                case "pre_": 
+                  $result = null; // TODO
+                  break;
+                case "key_":
+                  $result = null; // TODO
+                  break;
+                case "id__":
+                  $result = new NyzoStringPublicIdentifier($contentBytes);
+                  break;
+                case "pay_":
+                  $result = null; // TODO
+                  break;
+                case "tx__":
+                  $result = null;
+                  break;
+              }
+            }
+          }
+        }
+      }
+      catch(Exception $ignored) {
+        
+      }
+      return $result;
     }
 
 
@@ -115,6 +170,18 @@
         return $this->characterToValueMap[$key];
       }
       return $value;
+    }
+
+    private function createChecksum(array $contentArray): array {
+      // Need to use pack to convert contentArray into a binary string
+      // because hash function requires string input. Using C* will treat each item
+      // in the binary string as as char (UInt8)
+      $contentBufferBinaryStr = pack("C*", ...$contentArray);
+      $hash1Raw = hash('sha256', $contentBufferBinaryStr, true);
+      $checksumRaw = hash('sha256', $hash1Raw, true);
+      // Need to use unpack to convert the binary string back into an array of char (UInt8).
+      $checksum = unpack("C*", $checksumRaw);
+      return $checksum;
     }
   }
 ?>
