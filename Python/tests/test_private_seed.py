@@ -11,6 +11,8 @@ def test_vector0():
     )
     encoded = NyzoStringEncoder.encode(nyzo_string)
     assert encoded == "key_87jpjKgC.hXMHGLL50Ym9x4GSnGR918PV6CzpqKwM6WEgqRzfABZ"
+    decoded = NyzoStringEncoder.decode(encoded)
+    assert decoded.get_bytes() == nyzo_string.get_bytes()
 
 
 def test_vector8000():
@@ -19,6 +21,8 @@ def test_vector8000():
     )
     encoded = NyzoStringEncoder.encode(nyzo_string)
     assert encoded == "key_88ezNSZMyKGxWd9IxHc5dEMfjKr9fKop1N-MIGDGwov.tBBqPRDY"
+    decoded = NyzoStringEncoder.decode(encoded)
+    assert decoded.get_bytes() == nyzo_string.get_bytes()
 
 
 def test_vector13000():
@@ -27,6 +31,8 @@ def test_vector13000():
     )
     encoded = NyzoStringEncoder.encode(nyzo_string)
     assert encoded == "key_8endkrBjWxEsyBonTW-64NEiIQZPZnkoz4YFTbPfqWg1jt28sUiM"
+    decoded = NyzoStringEncoder.decode(encoded)
+    assert decoded.get_bytes() == nyzo_string.get_bytes()
 
 
 def test_vector19000():
@@ -35,6 +41,8 @@ def test_vector19000():
     )
     encoded = NyzoStringEncoder.encode(nyzo_string)
     assert encoded == "key_8c9jx25k.aF4B69TLfBzZpr1RP7iQJ4rBFVd-ZZyPr-QQWm3Ivcv"
+    decoded = NyzoStringEncoder.decode(encoded)
+    assert decoded.get_bytes() == nyzo_string.get_bytes()
 
 
 def test_vector25000():
@@ -43,6 +51,8 @@ def test_vector25000():
     )
     encoded = NyzoStringEncoder.encode(nyzo_string)
     assert encoded == "key_82z2R9_IExyyRbDqQ40c.hm9KR~Ijcs7H0R_ZQ0wNLuV9ieWk_p4"
+    decoded = NyzoStringEncoder.decode(encoded)
+    assert decoded.get_bytes() == nyzo_string.get_bytes()
 
 
 def test_vector79000():
@@ -51,6 +61,8 @@ def test_vector79000():
     )
     encoded = NyzoStringEncoder.encode(nyzo_string)
     assert encoded == "key_8dp9y_8Et~j7wMJ7EGB0mkYUZZmFVF7JuftXsMHV.n1upfKfwunh"
+    decoded = NyzoStringEncoder.decode(encoded)
+    assert decoded.get_bytes() == nyzo_string.get_bytes()
 
 
 if __name__ == "__main__":

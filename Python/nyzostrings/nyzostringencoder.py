@@ -7,9 +7,10 @@ ref: js impl
 
 from hashlib import sha256
 from nyzostrings.nyzostring import NyzoString
+from nyzostrings.nyzostringpublicidentifier import NyzoStringPublicIdentifier
+from nyzostrings.nyzostringprivateseed import NyzoStringPrivateSeed
 
-
-__version__ = "0.0.1"
+__version__ = "0.0.3"
 
 
 CHARACTER_LOOKUP = (
@@ -28,6 +29,9 @@ NYZO_PREFIXES_BYTES = {
     "pay_": bytes([96, 168, 127]),
     "tx__": bytes([114, 15, 255]),
 }
+
+# Get a list of valid prefixes for future use.
+NYZO_PREFIXES = NYZO_PREFIXES_BYTES.keys()
 
 HEADER_LENGTH = 4
 
@@ -64,6 +68,61 @@ class NyzoStringEncoder:
         checksum = sha256(sha256(content_view).digest()).digest()[:checksum_length]
         expanded_buffer[4 + content_bytes_len :] = checksum
         return cls.encoded_string_for_bytes(expanded_buffer)
+
+    @classmethod
+    def decode(cls, encoded_string: str) -> NyzoString:
+        result = None
+        try:
+            # Map characters from the old encoding to the new encoding. A few characters were changed to make Nyzo
+            # strings more URL-friendly.
+            encoded_string = encoded_string.replace('*', '-').replace('+', '.').replace('=', '~')
+            # Map characters that may be mistyped. Nyzo strings contain neither 'l' nor 'O'.
+            encoded_string = encoded_string.replace('l', '1').replace('O', '0')
+            # Get the type from the prefix. Here, type is the 4 char prefix as string.
+            string_type = encoded_string[:4]
+            # If the type is valid, continue.
+            if string_type in NYZO_PREFIXES:
+                # Get the array representation of the encoded string.
+                expanded_array = cls.bytes_for_encoded_string(encoded_string)
+                # Get the content length from the next byte and calculate the checksum length.
+                content_length = expanded_array[3] & 0xff
+                # print("content_length", content_length)
+                checksum_length = len(expanded_array) - content_length - 4
+                # print("checksum_length", checksum_length)
+                # Only continue if the checksum length is valid.
+                if 4 <= checksum_length <= 6:
+                    # Calculate the checksum and compare it to the provided checksum.
+                    # Only create the result array if the checksums match.
+                    content_buffer = memoryview(expanded_array)[0:HEADER_LENGTH + content_length]
+                    calculated_checksum = sha256(sha256(content_buffer).digest()).digest()[:checksum_length]
+                    provided_checksum = memoryview(expanded_array)[-checksum_length:]
+                    if provided_checksum.tobytes() == calculated_checksum:
+                        # Get the content array. This is the encoded object with the prefix, length byte, and checksum
+                        # removed.
+                        content_bytes = memoryview(expanded_array)[HEADER_LENGTH:content_length + HEADER_LENGTH]
+                        # print("Content", content_bytes.tobytes())
+                        # Make the object from the content array.
+                        if string_type == 'pre_':
+                            result = NyzoStringPrefilledData.from_bytes(content_bytes)
+                        elif string_type == 'key_':
+                            result = NyzoStringPrivateSeed(content_bytes)
+                        elif string_type == 'id__':
+                            result = NyzoStringPublicIdentifier(content_bytes)
+                        elif string_type == 'pay_':
+                            result = NyzoStringMicropay.from_bytes(content_bytes)
+                        elif string_type == 'tx__':
+                            result = NyzoStringTransaction.from_bytes(content_bytes)
+                    else:
+                        print("Invalid checksum: <{}> vs calc <{}>".format(provided_checksum.tobytes(), provided_checksum))
+                else:
+                    print("Invalid checksum len: <{}>".format(checksum_length))
+            else:
+                print("Unknown String type: <{}>".format(string_type))
+        except Exception as e:
+            print("Exception decode: {}".format(e))  # debug
+
+        return result
+
 
     @classmethod
     def bytes_for_encoded_string(cls, encoded_string: str) -> bytes:
