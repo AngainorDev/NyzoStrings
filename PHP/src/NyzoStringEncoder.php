@@ -23,7 +23,13 @@
     ];
 
     // Get a list of valid prefixes for future use.
-    const NYZO_PREFIXES = array_keys(NyzoStringEncoder::NYZO_PREFIXES_BYTES);
+    const NYZO_PREFIXES = [
+      "pre_",
+      "key_",
+      "id__",
+      "pay_",
+      "tx__"
+    ];
   
     const HEADER_LENGTH = 4;
 
