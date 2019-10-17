@@ -1,5 +1,5 @@
 """
-Nyzo String for private Seed
+Nyzo String for micropay
 """
 
 from nyzostrings.nyzostring import NyzoString
@@ -18,24 +18,25 @@ class NyzoStringMicropay(NyzoString):
         previous_hash_height: int,
         previous_block_hash: bytes,
     ) -> None:
+        index = 0
         sender_data = sender_data[:32]
         sender_data_len = len(sender_data)
         bytes_content = bytearray(32 + 1 + sender_data_len + 8 + 8 + 8 + 32)
         bytes_content[0:32] = receiver_identifier
-        bytes_content[32] = sender_data_len
-        bytes_content[33 : 33 + sender_data_len] = sender_data
-        bytes_content[
-            33 + sender_data_len : 33 + sender_data_len + 8
-        ] = amount.to_bytes(8, byteorder="big")
-        bytes_content[
-            33 + sender_data_len + 8 : 33 + sender_data_len + 8 + 8
-        ] = timestamp.to_bytes(8, byteorder="big")
-        bytes_content[
-            33 + sender_data_len + 8 + 8 : 33 + sender_data_len + 8 + 8 + 8
-        ] = previous_hash_height.to_bytes(8, byteorder="big")
-        bytes_content[
-            33 + sender_data_len + 8 + 8 + 8 : 33 + sender_data_len + 8 + 8 + 8 + 32
-        ] = previous_block_hash
+        index += 32
+        bytes_content[index] = sender_data_len
+        index += 1
+        bytes_content[index : index + sender_data_len] = sender_data
+        index += sender_data_len
+        bytes_content[index : index + 8] = amount.to_bytes(8, byteorder="big")
+        index += 8
+        bytes_content[index : index + 8] = timestamp.to_bytes(8, byteorder="big")
+        index += 8
+        bytes_content[index : index + 8] = previous_hash_height.to_bytes(
+            8, byteorder="big"
+        )
+        index += 8
+        bytes_content[index : index + 32] = previous_block_hash
         super().__init__("pay_", bytes_content)
         self.receiver_identifier = receiver_identifier
         self.sender_data = sender_data
@@ -47,38 +48,26 @@ class NyzoStringMicropay(NyzoString):
     @classmethod
     def from_bytes(cls, byte_buffer: bytes) -> "NyzoStringMicropay":
         buffer = memoryview(byte_buffer)
-        receiver_buffer = buffer[:32]
+        index = 0
+        receiver_buffer = buffer[index : index + 32]
+        index += 32
         sender_data_length = min(buffer[32] & 0xFF, 32)
-        data_buffer = buffer[33 : 33 + sender_data_length]
+        index += 1
+        data_buffer = buffer[index : index + sender_data_length]
+        index += sender_data_length
         amount = int.from_bytes(
-            buffer[33 + sender_data_length : 33 + sender_data_length + 8],
-            byteorder="big",
-            signed=False,
+            buffer[index : index + 8], byteorder="big", signed=False
         )
+        index += 8
         timestamp = int.from_bytes(
-            buffer[33 + sender_data_length + 8 : 33 + sender_data_length + 8 + 8],
-            byteorder="big",
-            signed=False,
+            buffer[index : index + 8], byteorder="big", signed=False
         )
+        index += 8
         previous_hash_height = int.from_bytes(
-            buffer[
-                33 + sender_data_length + 8 + 8 : 33 + sender_data_length + 8 + 8 + 8
-            ],
-            byteorder="big",
-            signed=False,
+            buffer[index : index + 8], byteorder="big", signed=False
         )
-        previous_block_hash_buffer = buffer[
-            33
-            + sender_data_length
-            + 8
-            + 8
-            + 8 : 33
-            + sender_data_length
-            + 8
-            + 8
-            + 8
-            + 32
-        ]
+        index += 8
+        previous_block_hash_buffer = buffer[index : index + 32]
         return NyzoStringMicropay(
             receiver_buffer,
             data_buffer,

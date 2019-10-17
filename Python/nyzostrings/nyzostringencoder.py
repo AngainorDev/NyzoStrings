@@ -11,9 +11,10 @@ from nyzostrings.nyzostringpublicidentifier import NyzoStringPublicIdentifier
 from nyzostrings.nyzostringprivateseed import NyzoStringPrivateSeed
 from nyzostrings.nyzostringmicropay import NyzoStringMicropay
 from nyzostrings.nyzostringprefilleddata import NyzoStringPrefilledData
+from nyzostrings.nyzostringtransaction import NyzoStringTransaction
 
 
-__version__ = "0.0.4"
+__version__ = "0.0.5"
 
 
 CHARACTER_LOOKUP = (
