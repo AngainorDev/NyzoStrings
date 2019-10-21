@@ -2,17 +2,17 @@
 
 ## Requirements
 
-- PHP 7.1+
+- PHP 7.1+  
 
-## Tests suite
+## Tests suite
 
 See test directory, run with `composer test`
 
-## Roadmap
+## Roadmap
 
 - Publish as composer package
 
-## Licence
+## License
 
 MIT Licence. (c) 2019 ryanc16.
 
