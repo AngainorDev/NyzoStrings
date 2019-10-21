@@ -1,7 +1,10 @@
 <?php
   require_once("./NyzoString.php");
-  require_once("./NyzoStringPublicIdentifier.php");
   require_once("./NyzoStringEncoder.php");
+  require_once("./NyzoStringMicropay.php");
+  require_once("./NyzoStringPrefilledData.php");
+  require_once("./NyzoStringPrivateSeed.php");
+  require_once("./NyzoStringPublicIdentifier.php");
   require_once("./NyzoStringTransaction.php");
-  
+  require_once("./NyzoStringType.php");
 ?>
