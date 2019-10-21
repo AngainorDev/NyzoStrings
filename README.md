@@ -11,15 +11,16 @@ Libraries to handle Nyzo Strings in various languages.
 ## Current state
 
 - Test vectors for all string types were extracted from reference Java implementation
-- Crude port of the java code to JavaScript
+- Port of the java code to JavaScript
+- Port of the java code to Python thanks to @eggpool
+- Port of the java code to PHP thanks to @ryanc16
 - Working encoding and decoding of all string types
-- Test suite
+- Test suites
 
-- Ongoing PR for a Python port
 
 ## Roadmap
 
-- Port library to other languages. PHP, Python, More
+- Port library to other languages than PHP and Python.
 
 ## Licence
 
