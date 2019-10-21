@@ -1,5 +1,8 @@
 <?php
-
+  /**
+   * ref: https://github.com/n-y-z-o/nyzoVerifier/blob/master/src/main/java/co/nyzo/verifier/nyzoString/NyzoStringType.java
+   * version: 0.0.2
+   */
   class NyzoStringType {
 
     private $type;
@@ -39,5 +42,4 @@
       return new NyzoStringType("tx__");
     }
   }
-
 ?>
