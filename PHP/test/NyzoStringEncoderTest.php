@@ -4,6 +4,8 @@
   use PHPUnit\Framework\TestCase;
   require_once("src/NyzoString.php");
   require_once("src/NyzoStringEncoder.php");
+  require_once("src/NyzoStringPublicIdentifier.php");
+  require_once("src/utils/Buffer.php");
 
   final class NyzoStringEncoderTest extends TestCase {
     
@@ -20,11 +22,21 @@
 
     /** @test */
     public function canEncodeToStringFromNyzoString(): void {
-      $nyzoString = new NyzoString("id__", [1, 2, 3]);
+      $identifier = Buffer::from([1, 2, 3]);
+      $nyzoString = new NyzoStringPublicIdentifier($identifier);
       $encodedString = $this->encoder->encode($nyzoString);
       $this->assertNotNull($encodedString);
       // Encoded value taken from JavaScript implementation
       $this->assertEquals("id__0N420WQ76Kwr", $encodedString);
+    }
+
+    /** @test */
+    public function canDecodeToNyzoStringFromString(): void {
+      $encodedString = "id__0N420WQ76Kwr";
+      $decoded = $this->encoder->decode($encodedString);
+      $this->assertNotNull($decoded);
+      $byteArray = [1, 2, 3];
+      $this->assertEquals($byteArray, $decoded->getBytes());
     }
 
     /** @test */
@@ -39,15 +51,16 @@
     }
 
     /** @test */
-    public function canCreateEncodedStringForByteArray(): void {
+    public function canCreateEncodedStringFromByteArray(): void {
       // Byte array value taken from JavaScript implementation
-      $byteArray = [72, 223, 255, 3, 1, 2, 3, 140, 135, 26, 215, 218];
+      $byteArray = Buffer::from([72, 223, 255, 3, 1, 2, 3, 140, 135, 26, 215, 218]);
       $encodedString = $this->encoder->encodedStringForByteArray($byteArray);
       $this->assertNotNull($encodedString);
       $this->assertIsString($encodedString);
-      $this->assertEquals("id__0N420WQ76Kwr", $encodedString);
+      $expectedEncodedString = "id__0N420WQ76Kwr";
+      $this->assertEquals(strlen($expectedEncodedString), strlen($encodedString));
+      $this->assertEquals($expectedEncodedString, $encodedString);
     }
-
   }
-
 ?>
+
