@@ -1,25 +1,39 @@
 <?php
-/**
- * ref: https://github.com/n-y-z-o/nyzoVerifier/blob/master/src/main/java/co/nyzo/verifier/nyzoString/NyzoStringPublicIdentifier.java
- */
+  /**
+   * ref: https://github.com/n-y-z-o/nyzoVerifier/blob/master/src/main/java/co/nyzo/verifier/nyzoString/NyzoStringPublicIdentifier.java
+   * version: 0.0.2
+   */
   require_once("NyzoString.php");
+  require_once("NyzoStringType.php");
+  require_once("utils/Buffer.php");
 
-  $version = "0.0.1";
+  final class NyzoStringPublicIdentifier implements NyzoString {
 
-  final class NyzoStringPublicIdentifier extends NyzoString {
+    /** array */
+    private $identifier;
 
-    public function __construct(array $identifier) {
-      parent::__construct("id__", $identifier);
+    public function __construct(Buffer $identifier) {
+      $this->identifier = $identifier;
     }
 
-    public function getIdentifier() {
-      return $this->bytes;
+    public function getIdentifier(): Buffer {
+      return $this->identifier;
+    }
+
+    /** @override */
+    public function getType(): NyzoStringType {
+      return NyzoStringType::PublicIdentifier();
+    }
+
+    /** @override */
+    public function getBytes(): array {
+      return $this->identifier->toArray();
     }
 
     public static function fromHex(string $hexString): NyzoStringPublicIdentifier {
       $filteredString = substr(implode("", explode("-", $hexString)), 0, 64);
-      $hexArray = unpack("C*", hex2bin($filteredString));
-      return new NyzoStringPublicIdentifier($hexArray);
+      $buff = Buffer::fromHex($filteredString);
+      return new NyzoStringPublicIdentifier($buff);
     }
   }
 ?>
