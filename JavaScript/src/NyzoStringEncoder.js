@@ -2,6 +2,11 @@
 // We tried to sick close to he java impl, but circular references and differences in the languages lead to some differences.
 
 const createHash = require('create-hash')
+const { NyzoStringPublicIdentifier } = require('./NyzoStringPublicIdentifier')
+const { NyzoStringPrivateSeed } = require('./NyzoStringPrivateSeed')
+const { NyzoStringPrefilledData } = require('./NyzoStringPrefilledData')
+const { NyzoStringMicropay } = require('./NyzoStringMicropay')
+const { NyzoStringTransaction } = require('./NyzoStringTransaction')
 
 
 const CHARACTER_LOOKUP = "0123456789" +
@@ -10,14 +15,17 @@ const CHARACTER_LOOKUP = "0123456789" +
             //"*+=_").toCharArray();       // old encoding, less URL-friendly
             "-.~_"                         // see https://tools.ietf.org/html/rfc3986#section-2.3
 
-// These were computed once by he test suite, then hardcoded here so NyzoStringType is not needed in real code.
+// These were computed once by the test suite, then hardcoded here so NyzoStringType is not needed in real code.
 const NYZO_PREFIXES_BYTES = {
     'pre_': new Uint8Array([97, 163, 191]),
-    'key_': new Uint8Array([80, 232, 227]),
+    'key_': new Uint8Array([80, 232, 127]),
     'id__': new Uint8Array([72, 223, 255]),
     'pay_': new Uint8Array([96, 168, 127]),
     'tx__': new Uint8Array([114, 15, 255]),
 }
+
+// Get a list of valid prefixes for future use.
+const NYZO_PREFIXES = Array.from(Object.keys(NYZO_PREFIXES_BYTES))
 
 const HEADER_LENGTH = 4
 
@@ -67,6 +75,63 @@ class NyzoStringEncoder {
         return this.encodedStringForByteArray(expandedBuffer)
     }
 
+  decode(encodedString) {
+      let result = null
+        try {
+            // Map characters from the old encoding to the new encoding. A few characters were changed to make Nyzo
+            // strings more URL-friendly.
+            encodedString = encodedString.replace('*', '-').replace('+', '.').replace('=', '~')
+            // Map characters that may be mistyped. Nyzo strings contain neither 'l' nor 'O'.
+            encodedString = encodedString.replace('l', '1').replace('O', '0')
+            // Get the type from the prefix. Here, type is the 4 char prefix as string.
+            const type = encodedString.substring(0, 4)
+            // If the type is valid, continue.
+            if (NYZO_PREFIXES.includes(type)) {
+                // Get the array representation of the encoded string.
+                const expandedArray = this.byteArrayForEncodedString(encodedString)
+                // Get the content length from the next byte and calculate the checksum length.
+                const contentLength = expandedArray[3] & 0xff
+                const checksumLength = expandedArray.length - contentLength - 4
+                // Only continue if the checksum length is valid.
+                if (checksumLength >= 4 && checksumLength <= 6) {
+                    // Calculate the checksum and compare it to the provided checksum.
+                    // Only create the result array if the checksums match.
+                    const contentBuffer = Buffer.from(expandedArray.slice(0, HEADER_LENGTH + contentLength))
+                    const fullCalculatedChecksum = createHash('sha256').update(createHash('sha256').update(contentBuffer).digest()).digest()
+                    const calculatedChecksum = fullCalculatedChecksum.slice(0,checksumLength)
+                    const providedChecksum = Buffer.from(expandedArray.slice(expandedArray.length - checksumLength, expandedArray.length))
+                    if (providedChecksum.equals(calculatedChecksum)) {
+                        // Get the content array. This is the encoded object with the prefix, length byte, and checksum
+                        // removed.
+                        const contentBytes = Buffer.from(expandedArray.slice(HEADER_LENGTH, expandedArray.length - checksumLength))
+                        // Make the object from the content array.
+                        switch (type) {
+                            case 'pre_':
+                                result = NyzoStringPrefilledData.fromByteBuffer(contentBytes)
+                                break
+                            case 'key_':
+                                result = new NyzoStringPrivateSeed(contentBytes)
+                                break
+                            case 'id__':
+                                result = new NyzoStringPublicIdentifier(contentBytes)
+                                break
+                            case 'pay_':
+                                result = NyzoStringMicropay.fromByteBuffer(contentBytes)
+                                break
+                            case 'tx__':
+                                result = NyzoStringTransaction.fromByteBuffer(contentBytes)
+                                break
+                        }
+                    }
+                }
+            }
+        } catch (ignored) {
+            console.log(ignored)  // debug
+        }
+
+        return result
+  }
+
   byteArrayForEncodedString(encodedString) {
         const arrayLength = (encodedString.length * 6 + 7) / 8
         let array = new Uint8Array(arrayLength)
@@ -105,11 +170,12 @@ class NyzoStringEncoder {
 
 }
 
+// This is the instance to be used
 nyzoStringEncoder = new NyzoStringEncoder()
 
 
 module.exports = {
-    version: "0.0.2",
+    version: "0.0.3",
     NyzoStringEncoder,
     nyzoStringEncoder
 }
