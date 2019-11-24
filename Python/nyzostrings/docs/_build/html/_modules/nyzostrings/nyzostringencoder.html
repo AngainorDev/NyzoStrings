@@ -1,0 +1,264 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>nyzostrings.nyzostringencoder &#8212; nyzostrings 0.0.3 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for nyzostrings.nyzostringencoder</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Nyzo String encoder</span>
+
+<span class="sd">ref: https://github.com/n-y-z-o/nyzoVerifier/blob/master/src/main/java/co/nyzo/verifier/nyzoString/NyzoStringEncoder.java</span>
+<span class="sd">ref: js impl</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">hashlib</span> <span class="k">import</span> <span class="n">sha256</span>
+<span class="kn">from</span> <span class="nn">nyzostrings.nyzostring</span> <span class="k">import</span> <span class="n">NyzoString</span>
+<span class="kn">from</span> <span class="nn">nyzostrings.nyzostringpublicidentifier</span> <span class="k">import</span> <span class="n">NyzoStringPublicIdentifier</span>
+<span class="kn">from</span> <span class="nn">nyzostrings.nyzostringprivateseed</span> <span class="k">import</span> <span class="n">NyzoStringPrivateSeed</span>
+<span class="kn">from</span> <span class="nn">nyzostrings.nyzostringmicropay</span> <span class="k">import</span> <span class="n">NyzoStringMicropay</span>
+<span class="kn">from</span> <span class="nn">nyzostrings.nyzostringprefilleddata</span> <span class="k">import</span> <span class="n">NyzoStringPrefilledData</span>
+<span class="kn">from</span> <span class="nn">nyzostrings.nyzostringtransaction</span> <span class="k">import</span> <span class="n">NyzoStringTransaction</span>
+
+
+<span class="n">__version__</span> <span class="o">=</span> <span class="s2">&quot;0.0.5&quot;</span>
+
+
+<span class="n">CHARACTER_LOOKUP</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;0123456789&quot;</span>
+    <span class="o">+</span> <span class="s2">&quot;abcdefghijkmnopqrstuvwxyz&quot;</span>  <span class="c1"># all except lowercase &quot;L&quot;</span>
+    <span class="o">+</span> <span class="s2">&quot;ABCDEFGHIJKLMNPQRSTUVWXYZ&quot;</span>  <span class="c1"># all except uppercase &quot;o&quot;</span>
+    <span class="o">+</span> <span class="s2">&quot;-.~_&quot;</span>
+<span class="p">)</span>
+
+
+<span class="c1"># From JS code</span>
+<span class="n">NYZO_PREFIXES_BYTES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;pre_&quot;</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">([</span><span class="mi">97</span><span class="p">,</span> <span class="mi">163</span><span class="p">,</span> <span class="mi">191</span><span class="p">]),</span>
+    <span class="s2">&quot;key_&quot;</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">([</span><span class="mi">80</span><span class="p">,</span> <span class="mi">232</span><span class="p">,</span> <span class="mi">127</span><span class="p">]),</span>
+    <span class="s2">&quot;id__&quot;</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">([</span><span class="mi">72</span><span class="p">,</span> <span class="mi">223</span><span class="p">,</span> <span class="mi">255</span><span class="p">]),</span>
+    <span class="s2">&quot;pay_&quot;</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">([</span><span class="mi">96</span><span class="p">,</span> <span class="mi">168</span><span class="p">,</span> <span class="mi">127</span><span class="p">]),</span>
+    <span class="s2">&quot;tx__&quot;</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">([</span><span class="mi">114</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">255</span><span class="p">]),</span>
+<span class="p">}</span>
+
+<span class="c1"># Get a list of valid prefixes for future use.</span>
+<span class="n">NYZO_PREFIXES</span> <span class="o">=</span> <span class="n">NYZO_PREFIXES_BYTES</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+
+<span class="n">HEADER_LENGTH</span> <span class="o">=</span> <span class="mi">4</span>
+
+<span class="n">CHARACTER_TO_VALUE</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="c1"># Init reverse index</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">char</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">CHARACTER_LOOKUP</span><span class="p">):</span>
+    <span class="n">CHARACTER_TO_VALUE</span><span class="p">[</span><span class="n">CHARACTER_LOOKUP</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">i</span>
+
+
+<div class="viewcode-block" id="NyzoStringEncoder"><a class="viewcode-back" href="../../nyzostrings.html#nyzostrings.nyzostringencoder.NyzoStringEncoder">[docs]</a><span class="k">class</span> <span class="nc">NyzoStringEncoder</span><span class="p">:</span>
+<div class="viewcode-block" id="NyzoStringEncoder.encode"><a class="viewcode-back" href="../../nyzostrings.html#nyzostrings.nyzostringencoder.NyzoStringEncoder.encode">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">encode</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">string_object</span><span class="p">:</span> <span class="n">NyzoString</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="c1"># Get the prefix array from the type and the content array from the content object.</span>
+        <span class="n">prefix_bytes</span> <span class="o">=</span> <span class="n">NYZO_PREFIXES_BYTES</span><span class="p">[</span><span class="n">string_object</span><span class="o">.</span><span class="n">get_type</span><span class="p">()]</span>
+        <span class="n">content_bytes</span> <span class="o">=</span> <span class="n">string_object</span><span class="o">.</span><span class="n">get_bytes</span><span class="p">()</span>
+        <span class="n">content_bytes_len</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">content_bytes</span><span class="p">)</span>
+        <span class="sd">&quot;&quot;&quot; Determine the length of the expanded array with the header and the checksum. The header is the type-specific</span>
+<span class="sd">        prefix in characters followed by a single byte that indicates the length of the content array (four bytes</span>
+<span class="sd">        total). The checksum is a minimum of 4 bytes and a maximum of 6 bytes, widening the expanded array so that</span>
+<span class="sd">        its length is divisible by 3.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">checksum_length</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">+</span> <span class="p">(</span><span class="mi">3</span> <span class="o">-</span> <span class="p">(</span><span class="n">content_bytes_len</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">%</span> <span class="mi">3</span><span class="p">)</span> <span class="o">%</span> <span class="mi">3</span>
+        <span class="n">expanded_length</span> <span class="o">=</span> <span class="n">HEADER_LENGTH</span> <span class="o">+</span> <span class="n">content_bytes_len</span> <span class="o">+</span> <span class="n">checksum_length</span>
+        <span class="sd">&quot;&quot;&quot; Create the array and add the header and the content. The first three bytes turn into the user-readable</span>
+<span class="sd">        prefix in the encoded string. The next byte specifies the length of the content array, and it is immediately</span>
+<span class="sd">        followed by the content array.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">expanded_buffer</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">expanded_length</span><span class="p">)</span>
+        <span class="n">expanded_buffer</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">prefix_bytes</span>
+        <span class="n">expanded_buffer</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">content_bytes_len</span>
+        <span class="n">expanded_buffer</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">4</span> <span class="o">+</span> <span class="n">content_bytes_len</span><span class="p">]</span> <span class="o">=</span> <span class="n">content_bytes</span>
+        <span class="n">content_view</span> <span class="o">=</span> <span class="nb">memoryview</span><span class="p">(</span><span class="n">expanded_buffer</span><span class="p">)[:</span> <span class="mi">4</span> <span class="o">+</span> <span class="n">content_bytes_len</span><span class="p">]</span>
+        <span class="n">checksum</span> <span class="o">=</span> <span class="n">sha256</span><span class="p">(</span><span class="n">sha256</span><span class="p">(</span><span class="n">content_view</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">())</span><span class="o">.</span><span class="n">digest</span><span class="p">()[:</span><span class="n">checksum_length</span><span class="p">]</span>
+        <span class="n">expanded_buffer</span><span class="p">[</span><span class="mi">4</span> <span class="o">+</span> <span class="n">content_bytes_len</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">checksum</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">encoded_string_for_bytes</span><span class="p">(</span><span class="n">expanded_buffer</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="NyzoStringEncoder.decode"><a class="viewcode-back" href="../../nyzostrings.html#nyzostrings.nyzostringencoder.NyzoStringEncoder.decode">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">decode</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">encoded_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NyzoString</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Map characters from the old encoding to the new encoding. A few characters were changed to make Nyzo</span>
+            <span class="c1"># strings more URL-friendly.</span>
+            <span class="n">encoded_string</span> <span class="o">=</span> <span class="n">encoded_string</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">,</span> <span class="s1">&#39;~&#39;</span><span class="p">)</span>
+            <span class="c1"># Map characters that may be mistyped. Nyzo strings contain neither &#39;l&#39; nor &#39;O&#39;.</span>
+            <span class="n">encoded_string</span> <span class="o">=</span> <span class="n">encoded_string</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;l&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;O&#39;</span><span class="p">,</span> <span class="s1">&#39;0&#39;</span><span class="p">)</span>
+            <span class="c1"># Get the type from the prefix. Here, type is the 4 char prefix as string.</span>
+            <span class="n">string_type</span> <span class="o">=</span> <span class="n">encoded_string</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span>
+            <span class="c1"># If the type is valid, continue.</span>
+            <span class="k">if</span> <span class="n">string_type</span> <span class="ow">in</span> <span class="n">NYZO_PREFIXES</span><span class="p">:</span>
+                <span class="c1"># Get the array representation of the encoded string.</span>
+                <span class="n">expanded_array</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">bytes_for_encoded_string</span><span class="p">(</span><span class="n">encoded_string</span><span class="p">)</span>
+                <span class="c1"># Get the content length from the next byte and calculate the checksum length.</span>
+                <span class="n">content_length</span> <span class="o">=</span> <span class="n">expanded_array</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">&amp;</span> <span class="mh">0xff</span>
+                <span class="c1"># print(&quot;content_length&quot;, content_length)</span>
+                <span class="n">checksum_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">expanded_array</span><span class="p">)</span> <span class="o">-</span> <span class="n">content_length</span> <span class="o">-</span> <span class="mi">4</span>
+                <span class="c1"># print(&quot;checksum_length&quot;, checksum_length)</span>
+                <span class="c1"># Only continue if the checksum length is valid.</span>
+                <span class="k">if</span> <span class="mi">4</span> <span class="o">&lt;=</span> <span class="n">checksum_length</span> <span class="o">&lt;=</span> <span class="mi">6</span><span class="p">:</span>
+                    <span class="c1"># Calculate the checksum and compare it to the provided checksum.</span>
+                    <span class="c1"># Only create the result array if the checksums match.</span>
+                    <span class="n">content_buffer</span> <span class="o">=</span> <span class="nb">memoryview</span><span class="p">(</span><span class="n">expanded_array</span><span class="p">)[</span><span class="mi">0</span><span class="p">:</span><span class="n">HEADER_LENGTH</span> <span class="o">+</span> <span class="n">content_length</span><span class="p">]</span>
+                    <span class="n">calculated_checksum</span> <span class="o">=</span> <span class="n">sha256</span><span class="p">(</span><span class="n">sha256</span><span class="p">(</span><span class="n">content_buffer</span><span class="p">)</span><span class="o">.</span><span class="n">digest</span><span class="p">())</span><span class="o">.</span><span class="n">digest</span><span class="p">()[:</span><span class="n">checksum_length</span><span class="p">]</span>
+                    <span class="n">provided_checksum</span> <span class="o">=</span> <span class="nb">memoryview</span><span class="p">(</span><span class="n">expanded_array</span><span class="p">)[</span><span class="o">-</span><span class="n">checksum_length</span><span class="p">:]</span>
+                    <span class="k">if</span> <span class="n">provided_checksum</span><span class="o">.</span><span class="n">tobytes</span><span class="p">()</span> <span class="o">==</span> <span class="n">calculated_checksum</span><span class="p">:</span>
+                        <span class="c1"># Get the content array. This is the encoded object with the prefix, length byte, and checksum</span>
+                        <span class="c1"># removed.</span>
+                        <span class="n">content_bytes</span> <span class="o">=</span> <span class="nb">memoryview</span><span class="p">(</span><span class="n">expanded_array</span><span class="p">)[</span><span class="n">HEADER_LENGTH</span><span class="p">:</span><span class="n">content_length</span> <span class="o">+</span> <span class="n">HEADER_LENGTH</span><span class="p">]</span>
+                        <span class="c1"># print(&quot;Content&quot;, content_bytes.tobytes())</span>
+                        <span class="c1"># Make the object from the content array.</span>
+                        <span class="k">if</span> <span class="n">string_type</span> <span class="o">==</span> <span class="s1">&#39;pre_&#39;</span><span class="p">:</span>
+                            <span class="n">result</span> <span class="o">=</span> <span class="n">NyzoStringPrefilledData</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">content_bytes</span><span class="p">)</span>
+                        <span class="k">elif</span> <span class="n">string_type</span> <span class="o">==</span> <span class="s1">&#39;key_&#39;</span><span class="p">:</span>
+                            <span class="n">result</span> <span class="o">=</span> <span class="n">NyzoStringPrivateSeed</span><span class="p">(</span><span class="n">content_bytes</span><span class="p">)</span>
+                        <span class="k">elif</span> <span class="n">string_type</span> <span class="o">==</span> <span class="s1">&#39;id__&#39;</span><span class="p">:</span>
+                            <span class="n">result</span> <span class="o">=</span> <span class="n">NyzoStringPublicIdentifier</span><span class="p">(</span><span class="n">content_bytes</span><span class="p">)</span>
+                        <span class="k">elif</span> <span class="n">string_type</span> <span class="o">==</span> <span class="s1">&#39;pay_&#39;</span><span class="p">:</span>
+                            <span class="n">result</span> <span class="o">=</span> <span class="n">NyzoStringMicropay</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">content_bytes</span><span class="p">)</span>
+                        <span class="k">elif</span> <span class="n">string_type</span> <span class="o">==</span> <span class="s1">&#39;tx__&#39;</span><span class="p">:</span>
+                            <span class="n">result</span> <span class="o">=</span> <span class="n">NyzoStringTransaction</span><span class="o">.</span><span class="n">from_bytes</span><span class="p">(</span><span class="n">content_bytes</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Invalid checksum: &lt;</span><span class="si">{}</span><span class="s2">&gt; vs calc &lt;</span><span class="si">{}</span><span class="s2">&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">provided_checksum</span><span class="o">.</span><span class="n">tobytes</span><span class="p">(),</span> <span class="n">provided_checksum</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Invalid checksum len: &lt;</span><span class="si">{}</span><span class="s2">&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">checksum_length</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Unknown String type: &lt;</span><span class="si">{}</span><span class="s2">&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">string_type</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Exception decode: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>  <span class="c1"># debug</span>
+
+        <span class="k">return</span> <span class="n">result</span></div>
+
+
+<div class="viewcode-block" id="NyzoStringEncoder.bytes_for_encoded_string"><a class="viewcode-back" href="../../nyzostrings.html#nyzostrings.nyzostringencoder.NyzoStringEncoder.bytes_for_encoded_string">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">bytes_for_encoded_string</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">encoded_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+        <span class="n">array_length</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">encoded_string</span><span class="p">)</span> <span class="o">*</span> <span class="mi">6</span> <span class="o">+</span> <span class="mi">7</span><span class="p">)</span> <span class="o">//</span> <span class="mi">8</span>
+        <span class="n">array</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">array_length</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">array_length</span><span class="p">):</span>
+            <span class="n">left_character</span> <span class="o">=</span> <span class="n">encoded_string</span><span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="mi">8</span> <span class="o">//</span> <span class="mi">6</span><span class="p">]</span>
+            <span class="n">right_character</span> <span class="o">=</span> <span class="n">encoded_string</span><span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="mi">8</span> <span class="o">//</span> <span class="mi">6</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">left_value</span> <span class="o">=</span> <span class="n">CHARACTER_TO_VALUE</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">left_character</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">right_value</span> <span class="o">=</span> <span class="n">CHARACTER_TO_VALUE</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">right_character</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">bit_offset</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span> <span class="o">%</span> <span class="mi">6</span>
+            <span class="n">array</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(((</span><span class="n">left_value</span> <span class="o">&lt;&lt;</span> <span class="mi">6</span><span class="p">)</span> <span class="o">+</span> <span class="n">right_value</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="mi">4</span> <span class="o">-</span> <span class="n">bit_offset</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xFF</span>
+        <span class="k">return</span> <span class="n">array</span></div>
+
+<div class="viewcode-block" id="NyzoStringEncoder.encoded_string_for_bytes"><a class="viewcode-back" href="../../nyzostrings.html#nyzostrings.nyzostringencoder.NyzoStringEncoder.encoded_string_for_bytes">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">encoded_string_for_bytes</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">array</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">bit_offset</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">encoded_string</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">while</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
+            <span class="c1"># Get the current and next byte.</span>
+            <span class="n">left_byte</span> <span class="o">=</span> <span class="n">array</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">&amp;</span> <span class="mh">0xFF</span>
+            <span class="n">right_byte</span> <span class="o">=</span> <span class="n">array</span><span class="p">[</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">&amp;</span> <span class="mh">0xFF</span> <span class="k">if</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">array</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">else</span> <span class="mi">0</span>
+            <span class="c1"># Append the character for the next 6 bits in the array.</span>
+            <span class="n">lookup_index</span> <span class="o">=</span> <span class="p">(((</span><span class="n">left_byte</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span><span class="p">)</span> <span class="o">+</span> <span class="n">right_byte</span><span class="p">)</span> <span class="o">&gt;&gt;</span> <span class="p">(</span><span class="mi">10</span> <span class="o">-</span> <span class="n">bit_offset</span><span class="p">))</span> <span class="o">&amp;</span> <span class="mh">0x3F</span>
+            <span class="n">encoded_string</span> <span class="o">+=</span> <span class="n">CHARACTER_LOOKUP</span><span class="p">[</span><span class="n">lookup_index</span><span class="p">]</span>
+            <span class="c1"># Advance forward 6 bits.</span>
+            <span class="k">if</span> <span class="n">bit_offset</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">bit_offset</span> <span class="o">=</span> <span class="mi">6</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">index</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">bit_offset</span> <span class="o">-=</span> <span class="mi">2</span>
+        <span class="k">return</span> <span class="n">encoded_string</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">nyzostrings</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">nyzostrings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../modules.html">nyzostrings</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../history.html">History</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, EggdraSyl from Bismuth Foundation.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.6</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.11</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

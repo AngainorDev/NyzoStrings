@@ -18,5 +18,6 @@ MIT Licence. (c) 2019 EggdraSyl.
 
 ## Changelog
 
+- 0.0.3: Refactor for PyPi distribution
 - 0.0.2: All types are supported, encode + decode + tests, iso from js code.
 - 0.0.1: Initial commit, publicIdentifier encode.
