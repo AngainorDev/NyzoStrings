@@ -8,6 +8,7 @@ ref: js impl
 from hashlib import sha256
 from nyzostrings.nyzostring import NyzoString
 from nyzostrings.nyzostringpublicidentifier import NyzoStringPublicIdentifier
+from nyzostrings.nyzostringsignature import NyzoStringSignature
 from nyzostrings.nyzostringprivateseed import NyzoStringPrivateSeed
 from nyzostrings.nyzostringmicropay import NyzoStringMicropay
 from nyzostrings.nyzostringprefilleddata import NyzoStringPrefilledData
@@ -32,6 +33,7 @@ NYZO_PREFIXES_BYTES = {
     "id__": bytes([72, 223, 255]),
     "pay_": bytes([96, 168, 127]),
     "tx__": bytes([114, 15, 255]),
+    "sig_": bytes([0x6d,0x24,0x3f]),
 }
 
 # Get a list of valid prefixes for future use.
@@ -88,6 +90,7 @@ class NyzoStringEncoder:
             if string_type in NYZO_PREFIXES:
                 # Get the array representation of the encoded string.
                 expanded_array = cls.bytes_for_encoded_string(encoded_string)
+                # print("x", expanded_array.hex())
                 # Get the content length from the next byte and calculate the checksum length.
                 content_length = expanded_array[3] & 0xff
                 # print("content_length", content_length)
@@ -116,6 +119,8 @@ class NyzoStringEncoder:
                             result = NyzoStringMicropay.from_bytes(content_bytes)
                         elif string_type == 'tx__':
                             result = NyzoStringTransaction.from_bytes(content_bytes)
+                        elif string_type == 'sig_':
+                            result = NyzoStringSignature(content_bytes)
                     else:
                         print("Invalid checksum: <{}> vs calc <{}>".format(provided_checksum.tobytes(), provided_checksum))
                 else:
