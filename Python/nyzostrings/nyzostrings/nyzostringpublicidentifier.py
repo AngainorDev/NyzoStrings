@@ -21,4 +21,3 @@ class NyzoStringPublicIdentifier(NyzoString):
         filtered_string = hex_string.replace('-', '')[:64]
         return NyzoStringPublicIdentifier(bytes.fromhex(filtered_string))
 
-
