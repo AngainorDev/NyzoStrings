@@ -16,9 +16,11 @@ git clone or `npm install nyzostrings`
 - Working encoding + decoding of Transactions string type - **Only standard transactions**
 - Working encoding + decoding of Signature string type
 - Test suite
+- First try at Cycle vote in tx__ strings
 
 ## Changelog
 
+- 0.0.8: Support for Cycle Vote Transactions 
 - 0.0.7: Signature encoding and decoding, test vectors.
 - 0.0.6: Standard transactions encoding and decoding, test vectors.
 - 0.0.5: Micropay encoding and decoding, test vectors.

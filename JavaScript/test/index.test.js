@@ -272,3 +272,21 @@ describe("Signature Tests", () => {
   })
 })
 
+
+describe("Vote Transaction Tests", () => {
+ // This is no official test vector, with fake info. Do not use as a real test vector until confirmed.
+ test("Vector 0", () => {
+    // timestampHex, senderHex, signatureHex, vote, transactionSignatureHex {
+    const nyzoString = NyzoStringTransaction.fromHexVote(
+        "9bdecd1085b8f5e1",
+        "3ce4eaf311934276-673752ccb5cf4cac-61eed231d8fcb649-6310887ecf99f6e5",
+        "6a675732bd20a2c203a925fc62f1d5249b98c128b555472c980f84d9d37fb3452c7211ea448eeed51b7af17785490593a429e97a4f373788a1a768e40d64657c",
+        1,
+        "1da1460c6b796f7e44734fd2a7b01c63846e42df4ba422a717c1e1389b5a0e539f2337c41345d86b12a9b48728eb72483f85a2d8fde0b612bdcd85453b05b702" // fake sig
+        )
+    const encoded = nyzoStringEncoder.encode(nyzoString)
+    expect(encoded).toBe('tx__HxisVJSgysATWg0000000000000000000000000000000000000000000hUyhxPIvn.~h7dfSHvN76e4sBbwiYgzGPw1WjzsnxXjEQcVP1d5U6JiHsi7aeKQi3~5FKA.WbpiMtU5hjJ5KN9HqTtQMi2zNxeG9wPz-ukBDXA1abmmhQQp3WjqSV~RhiPQ4vG4ALZm6VIPuWm91qeBavCYjRtVza6Eregdq6m-gkxbEv41')
+    const decoded = nyzoStringEncoder.decode(encoded)
+    expect(decoded.getBytes()).toEqual(nyzoString.getBytes())
+  })
+})
