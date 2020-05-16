@@ -10,7 +10,8 @@ const NyzoTypes = {
     PrivateSeed: 'key_',
     PublicIdentifier: 'id__',
     Micropay: 'pay_',
-    Transaction: 'tx__'
+    Transaction: 'tx__',
+    Signature: 'sig_'
 }
 
 const NyzoPrefixesBytes = {

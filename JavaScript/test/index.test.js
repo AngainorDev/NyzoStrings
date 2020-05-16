@@ -5,10 +5,10 @@ const { NyzoStringPrivateSeed } = require('../src/NyzoStringPrivateSeed')
 const { NyzoStringPrefilledData } = require('../src/NyzoStringPrefilledData')
 const { NyzoStringMicropay } = require('../src/NyzoStringMicropay')
 const { NyzoStringTransaction } = require('../src/NyzoStringTransaction')
-
+const { NyzoStringSignature } = require('../src/NyzoStringSignature')
 const { nyzoStringEncoder } = require('../src/NyzoStringEncoder')
 
-
+/*
 describe("Tests Debug", () => {
   test("Trace1", () => {
     const ttyped = NyzoStringType.forType('PrefilledData')
@@ -21,9 +21,11 @@ describe("Tests Debug", () => {
     console.log("Type Micropay", ttype3)
     const ttype4 = NyzoStringType.forType('Transaction')
     console.log("Type Transaction", ttype4)
+    const ttype5 = NyzoStringType.forType('Signature')
+    console.log("Type Transaction", ttype5)
   })
  })
-
+*/
 
 describe("Old charset Tests", () => {
       test("TODO", () => {
@@ -246,3 +248,27 @@ describe("Transaction Tests", () => {
   })
 
 })
+
+
+describe("Signature Tests", () => {
+  test("Decode 0", () => {
+    const encoded = "sig_g2kGPq81_97Rj-T3ampXC_H9Y~5I5okrKIBY2qzcsndZDzAiGV~xaA6kqMIi.tNIrxf3N6vkPBYPDQgS8WcJ_x6Ya_pG"
+    const decoded = nyzoStringEncoder.decode(encoded)
+    expect(decoded.getBytes().toString('hex')).toEqual("2529c59201fc91f34fcd4329563997fa89ebe16b15751ab6b93a09988c6d637b9a28d2a77fa02a319466fad2f5cc2b6a03c3c06794c64eb19b243423832cfe01")
+  })
+  test("Vector 0", () => {
+    const nyzoString = new NyzoStringSignature(Buffer.from("2529c59201fc91f34fcd4329563997fa89ebe16b15751ab6b93a09988c6d637b9a28d2a77fa02a319466fad2f5cc2b6a03c3c06794c64eb19b243423832cfe01",'hex'))
+    const encoded = nyzoStringEncoder.encode(nyzoString)
+    expect(encoded).toEqual("sig_g2kGPq81_97Rj-T3ampXC_H9Y~5I5okrKIBY2qzcsndZDzAiGV~xaA6kqMIi.tNIrxf3N6vkPBYPDQgS8WcJ_x6Ya_pG")
+    const decoded = nyzoStringEncoder.decode(encoded)
+    expect(decoded.getBytes()).toEqual(nyzoString.getBytes())
+  })
+  test("Vector 1", () => {
+    const nyzoString = new NyzoStringSignature(Buffer.from("1da1460c6b796f7e44734fd2a7b01c63846e42df4ba422a717c1e1389b5a0e539f2337c41345d86b12a9b48728eb72483f85a2d8fde0b612bdcd85453b05b702",'hex'))
+    const encoded = nyzoStringEncoder.encode(nyzoString)
+    expect(encoded).toEqual("sig_g1UyhxPIvn.~h7dfSHvN76e4sBbwiYgzGPw1WjzsnxXjEQcVP1d5U6JiHsi7aeKQi3~5FKA.WbpiMtU5hjJ5KN8xEaQt")
+    const decoded = nyzoStringEncoder.decode(encoded)
+    expect(decoded.getBytes()).toEqual(nyzoString.getBytes())
+  })
+})
+

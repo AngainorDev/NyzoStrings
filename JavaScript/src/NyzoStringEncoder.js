@@ -7,6 +7,7 @@ const { NyzoStringPrivateSeed } = require('./NyzoStringPrivateSeed')
 const { NyzoStringPrefilledData } = require('./NyzoStringPrefilledData')
 const { NyzoStringMicropay } = require('./NyzoStringMicropay')
 const { NyzoStringTransaction } = require('./NyzoStringTransaction')
+const { NyzoStringSignature } = require('./NyzoStringSignature')
 
 
 const CHARACTER_LOOKUP = "0123456789" +
@@ -22,6 +23,7 @@ const NYZO_PREFIXES_BYTES = {
     'id__': new Uint8Array([72, 223, 255]),
     'pay_': new Uint8Array([96, 168, 127]),
     'tx__': new Uint8Array([114, 15, 255]),
+    'sig_': new Uint8Array([0x6d,0x24,0x3f])
 }
 
 // Get a list of valid prefixes for future use.
@@ -121,6 +123,9 @@ class NyzoStringEncoder {
                             case 'tx__':
                                 result = NyzoStringTransaction.fromByteBuffer(contentBytes)
                                 break
+                            case 'sig_':
+                                result = new NyzoStringSignature(contentBytes)
+                                break
                         }
                     }
                 }
@@ -175,7 +180,7 @@ nyzoStringEncoder = new NyzoStringEncoder()
 
 
 module.exports = {
-    version: "0.0.3",
+    version: "0.0.4",
     NyzoStringEncoder,
     nyzoStringEncoder
 }
