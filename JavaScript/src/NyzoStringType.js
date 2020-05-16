@@ -19,6 +19,7 @@ const NyzoPrefixesBytes = {
     'id__': new Uint8Array([72, 223, 255]),
     'pay_': new Uint8Array([96, 168, 127]),
     'tx__': new Uint8Array([114, 15, 255]),
+    'sig_': new Uint8Array([0x6d,0x24,0x3f])
 }
 
 class NyzoStringType {
