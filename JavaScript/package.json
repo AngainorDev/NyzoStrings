@@ -1,6 +1,6 @@
 {
   "name": "nyzostrings",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "NyzoString NodeJS Library",
   "main": "index.js",
   "directories": {

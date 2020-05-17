@@ -285,7 +285,7 @@ describe("Vote Transaction Tests", () => {
         "1da1460c6b796f7e44734fd2a7b01c63846e42df4ba422a717c1e1389b5a0e539f2337c41345d86b12a9b48728eb72483f85a2d8fde0b612bdcd85453b05b702" // fake sig
         )
     const encoded = nyzoStringEncoder.encode(nyzoString)
-    expect(encoded).toBe('tx__HxisVJSgysATWg0000000000000000000000000000000000000000000hUyhxPIvn.~h7dfSHvN76e4sBbwiYgzGPw1WjzsnxXjEQcVP1d5U6JiHsi7aeKQi3~5FKA.WbpiMtU5hjJ5KN9HqTtQMi2zNxeG9wPz-ukBDXA1abmmhQQp3WjqSV~RhiPQ4vG4ALZm6VIPuWm91qeBavCYjRtVza6Eregdq6m-gkxbEv41')
+    expect(encoded).toBe('tx__HxisVJSgysATWjRBYMchBS9UqRuiRbofjaPyZK8PUfQUincgz7ZfDwsC0hUyhxPIvn.~h7dfSHvN76e4sBbwiYgzGPw1WjzsnxXjEQcVP1d5U6JiHsi7aeKQi3~5FKA.WbpiMtU5hjJ5KN9HqTtQMi2zNxeG9wPz-ukBDXA1abmmhQQp3WjqSV~RhiPQ4vG4ALZm6VIPuWm91qeBavCYjRtVza6Eregdq6m-hccQ7-vf')
     const decoded = nyzoStringEncoder.decode(encoded)
     expect(decoded.getBytes()).toEqual(nyzoString.getBytes())
   })

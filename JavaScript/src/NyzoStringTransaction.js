@@ -45,7 +45,7 @@ class NyzoStringTransaction extends NyzoString {
         let bytes = Buffer.alloc(1 + 8 + 32 + 1 + 64 + 64)
         bytes[0] = txType
         timestamp.copy(bytes, 1)
-        Buffer.from(receiverIdentifier).copy(bytes, 1 + 8)
+        Buffer.from(senderIdentifier).copy(bytes, 1 + 8)
         bytes[1 + 8 + 32] = vote
         Buffer.from(transactionSignature).copy(bytes, 1 + 8 + 32 + 1)
         Buffer.from(signature).copy(bytes,  1 + 8 + 32 + 1 + 64)

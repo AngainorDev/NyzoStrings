@@ -20,6 +20,7 @@ git clone or `npm install nyzostrings`
 
 ## Changelog
 
+- 0.0.9: Fix in constructor and test vector 
 - 0.0.8: Support for Cycle Vote Transactions 
 - 0.0.7: Signature encoding and decoding, test vectors.
 - 0.0.6: Standard transactions encoding and decoding, test vectors.
