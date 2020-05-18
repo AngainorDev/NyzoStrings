@@ -54,7 +54,7 @@ def test_vector_vote():
     encoded = NyzoStringEncoder.encode(nyzo_string)
     assert (
         encoded
-        == "tx__HxisVJSgysATWg0000000000000000000000000000000000000000000hUyhxPIvn.~h7dfSHvN76e4sBbwiYgzGPw1WjzsnxXjEQcVP1d5U6JiHsi7aeKQi3~5FKA.WbpiMtU5hjJ5KN9HqTtQMi2zNxeG9wPz-ukBDXA1abmmhQQp3WjqSV~RhiPQ4vG4ALZm6VIPuWm91qeBavCYjRtVza6Eregdq6m-gkxbEv41"
+        == "tx__HxisVJSgysATWjRBYMchBS9UqRuiRbofjaPyZK8PUfQUincgz7ZfDwsC0hUyhxPIvn.~h7dfSHvN76e4sBbwiYgzGPw1WjzsnxXjEQcVP1d5U6JiHsi7aeKQi3~5FKA.WbpiMtU5hjJ5KN9HqTtQMi2zNxeG9wPz-ukBDXA1abmmhQQp3WjqSV~RhiPQ4vG4ALZm6VIPuWm91qeBavCYjRtVza6Eregdq6m-hccQ7-vf"
     )
     decoded = NyzoStringEncoder.decode(encoded)
     assert decoded.get_bytes() == nyzo_string.get_bytes()

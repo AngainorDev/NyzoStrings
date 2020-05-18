@@ -2,6 +2,11 @@
 History
 =======
 
+0.0.6 (2020-05-18)
+------------------
+
+* Propagate vote transactions fix from js version
+
 0.0.5 (2020-05-16)
 ------------------
 

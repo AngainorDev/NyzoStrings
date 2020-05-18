@@ -5,7 +5,7 @@ Nyzo String for transaction
 from nyzostrings.nyzostring import NyzoString
 
 
-__version__ = "0.0.2"
+__version__ = "0.0.3"
 
 
 class NyzoStringTransaction(NyzoString):
@@ -58,7 +58,7 @@ class NyzoStringTransaction(NyzoString):
             index += 1
             bytes_content[index: index + 8] = timestamp.to_bytes(8, byteorder="big")
             index += 8
-            bytes_content[index: index + 32] = receiver_identifier
+            bytes_content[index: index + 32] = sender_identifier
             index += 32
             bytes_content[1 + 8 + 32] = vote
             index += 1
