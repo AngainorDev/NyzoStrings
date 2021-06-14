@@ -1,8 +1,8 @@
 # Test Vectors
 
-## Goal
+## Goal
 
-Provide test vectors issued by the reference Java Implementation, so other implementations in oher languages can match against.
+Provide test vectors issued by the reference Java Implementation, so other implementations in other languages can match against.
 
 ## Method
 
