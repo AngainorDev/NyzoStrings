@@ -18,6 +18,44 @@ def test_vector0():
     decoded = NyzoStringEncoder.decode(encoded)
     assert decoded.receiver_identifier == nyzo_string.receiver_identifier
     assert decoded.sender_data == nyzo_string.sender_data
+    assert decoded.amount == 0
+    assert decoded.get_bytes() == nyzo_string.get_bytes()
+
+
+def test_vector0new():
+    nyzo_string = NyzoStringPrefilledData.from_hex(
+        "848db2de31cbe4c4-28dbb9e6bdda3aba-98581356ab0e6e02-37b37fd370ac3c7b",
+        # id__88idJKWPQ~j4adLXXIVreIHpn1dnHNXL0AvRw.dNI3PZXtxdHx7u
+        "",
+    )
+    encoded = NyzoStringEncoder.encode(nyzo_string)
+    assert (
+        encoded
+        == "pre_8pidJKWPQ~j4adLXXIVreIHpn1dnHNXL0AvRw.dNI3PZ0fp93qvz"
+    )
+    decoded = NyzoStringEncoder.decode(encoded)
+    assert decoded.receiver_identifier == nyzo_string.receiver_identifier
+    assert decoded.sender_data == nyzo_string.sender_data
+    assert decoded.amount == nyzo_string.amount
+    assert decoded.get_bytes() == nyzo_string.get_bytes()
+
+
+def test_vector0new2():
+    nyzo_string = NyzoStringPrefilledData.from_hex(
+        "848db2de31cbe4c4-28dbb9e6bdda3aba-98581356ab0e6e02-37b37fd370ac3c7b",
+        # id__88idJKWPQ~j4adLXXIVreIHpn1dnHNXL0AvRw.dNI3PZXtxdHx7u
+        "",
+        10*1000000  # Amount to be provided as int, micronyzos. no amount = 0.
+    )
+    encoded = NyzoStringEncoder.encode(nyzo_string)
+    assert (
+        encoded
+        == "pre_apidJKWPQ~j4adLXXIVreIHpn1dnHNXL0AvRw.dNI3PZx0000000D9r0fJmDjEFZ"
+    )
+    decoded = NyzoStringEncoder.decode(encoded)
+    assert decoded.receiver_identifier == nyzo_string.receiver_identifier
+    assert decoded.sender_data == nyzo_string.sender_data
+    assert decoded.amount == nyzo_string.amount
     assert decoded.get_bytes() == nyzo_string.get_bytes()
 
 
@@ -110,4 +148,5 @@ def test_vector75000_corrupted():
 
 
 if __name__ == "__main__":
-    test_vector0()
+    test_vector0new()
+    test_vector0new2()
