@@ -11,7 +11,7 @@ git clone or `npm install nyzostrings`
 - Working encoding of PublicIdentifier string type
 - Working decoding of PublicIdentifier string type
 - Working encoding + decoding of PrivateSeed string type
-- Working encoding + decoding of PrefilledData string type
+- Working encoding + decoding of PrefilledData string type, including optional amount
 - Working encoding + decoding of Micropay string type
 - Working encoding + decoding of Transactions string type - **Only standard transactions**
 - Working encoding + decoding of Signature string type
@@ -20,6 +20,7 @@ git clone or `npm install nyzostrings`
 
 ## Changelog
 
+- 0.0.10: "pre" string upgrade 
 - 0.0.9: Fix in constructor and test vector 
 - 0.0.8: Support for Cycle Vote Transactions 
 - 0.0.7: Signature encoding and decoding, test vectors.

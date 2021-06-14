@@ -3,9 +3,10 @@ Libraries to handle Nyzo Strings in various languages.
 
 ## References
 
-- https://nyzo.co/releaseNotes/524
-- https://nyzo.co/releaseNotes/525
-- https://nyzo.co/releaseNotes/526
+- http://tech.nyzo.co/releaseNotes/v609
+- http://tech.nyzo.co/releaseNotes/v524
+- http://tech.nyzo.co/releaseNotes/v525
+- http://tech.nyzo.co/releaseNotes/v526
 - https://github.com/n-y-z-o/nyzoVerifier
 
 ## Current state

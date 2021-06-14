@@ -8,6 +8,8 @@ const { NyzoStringTransaction } = require('../src/NyzoStringTransaction')
 const { NyzoStringSignature } = require('../src/NyzoStringSignature')
 const { nyzoStringEncoder } = require('../src/NyzoStringEncoder')
 
+const Int64 = require('node-int64')
+
 /*
 describe("Tests Debug", () => {
   test("Trace1", () => {
@@ -135,6 +137,7 @@ describe("PrivateSeed Tests", () => {
     expect(decoded.getReceiverIdentifier()).toEqual(nyzoString.getReceiverIdentifier())
     expect(decoded.getSenderData()).toEqual(nyzoString.getSenderData())
     expect(decoded.getBytes()).toEqual(nyzoString.getBytes())
+    expect(decoded.getAmount().toString()).toEqual("0")
   })
   test("Vector 17000", () => {
     const nyzoString = NyzoStringPrefilledData.fromHex("53daaf0f7243222a-89324a82a2f2da6d-e9a3c025c3156b9d-fbd1bdab6af1409c", "536142cd5127b085fd48d3512cc3300abdd7bbca774d691e76437f7db0")
@@ -144,6 +147,7 @@ describe("PrivateSeed Tests", () => {
     expect(decoded.getReceiverIdentifier()).toEqual(nyzoString.getReceiverIdentifier())
     expect(decoded.getSenderData()).toEqual(nyzoString.getSenderData())
     expect(decoded.getBytes()).toEqual(nyzoString.getBytes())
+    expect(decoded.getAmount().toString()).toEqual("0")
   })
   test("Vector 44000", () => {
     // Take care to include at least one test with empty data
@@ -154,6 +158,7 @@ describe("PrivateSeed Tests", () => {
     expect(decoded.getReceiverIdentifier()).toEqual(nyzoString.getReceiverIdentifier())
     expect(decoded.getSenderData()).toEqual(nyzoString.getSenderData())
     expect(decoded.getBytes()).toEqual(nyzoString.getBytes())
+    expect(decoded.getAmount().toString()).toEqual("0")
   })
   test("Vector 75000", () => {
     // max data size
@@ -164,6 +169,7 @@ describe("PrivateSeed Tests", () => {
     expect(decoded.getReceiverIdentifier()).toEqual(nyzoString.getReceiverIdentifier())
     expect(decoded.getSenderData()).toEqual(nyzoString.getSenderData())
     expect(decoded.getBytes()).toEqual(nyzoString.getBytes())
+    expect(decoded.getAmount().toString()).toEqual("0")
   })
 })
 
@@ -180,6 +186,7 @@ describe("PrivateSeed Tests", () => {
     expect(decoded.getReceiverIdentifier()).toEqual(nyzoString.getReceiverIdentifier())
     expect(decoded.getSenderData()).toEqual(nyzoString.getSenderData())
     expect(decoded.getBytes()).toEqual(nyzoString.getBytes())
+    expect(decoded.getAmount().toString()).toEqual("0")
   })
   test("Vector 75000 + noise18", () => {
     const encoded2 = 'pre_go62U7kUwZJQZMz37kt7DEA.or.YHYFkoyMsihhErLmX8814Y1e.DJ~359FPU1Ezb88eV7sRRg3dy~qXn4CvmzRjFuo.qVfn' + 'qXn4CvmzRjFuo.qVfn' // Add content at end
@@ -197,6 +204,22 @@ describe("PrivateSeed Tests", () => {
     expect(decoded2).toBe(null)  // checksum does not match
   })
 
+ })
+
+
+describe("Prefilled Data Custom Tests 2", () => {
+    // include custom tests from the python port, with extra amount
+  test("Vector prefilled with amount", () => {
+    // max data size + more data
+    const nyzoString = NyzoStringPrefilledData.fromHex("848db2de31cbe4c4-28dbb9e6bdda3aba-98581356ab0e6e02-37b37fd370ac3c7b", "", new Int64(10*1000000))
+    const encoded = nyzoStringEncoder.encode(nyzoString)
+    expect(encoded).toBe('pre_apidJKWPQ~j4adLXXIVreIHpn1dnHNXL0AvRw.dNI3PZx0000000D9r0fJmDjEFZ')
+    const decoded = nyzoStringEncoder.decode(encoded)
+    expect(decoded.getReceiverIdentifier()).toEqual(nyzoString.getReceiverIdentifier())
+    expect(decoded.getSenderData()).toEqual(nyzoString.getSenderData())
+    expect(decoded.getBytes()).toEqual(nyzoString.getBytes())
+    expect(decoded.getAmount().toString()).toEqual("10000000")
+  })
  })
 
 
